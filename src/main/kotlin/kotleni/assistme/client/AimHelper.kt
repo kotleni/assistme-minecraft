@@ -4,7 +4,9 @@ import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.mob.HostileEntity
+import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
+import net.minecraft.util.math.Vec3d
 import kotlin.math.atan2
 import kotlin.math.sqrt
 
@@ -69,6 +71,29 @@ object AimHelper {
         // Apply a fraction of the difference each tick, based on the smoothness factor
         val newYaw = player.yaw + yawDifference * AimAssistConfig.smoothnessFactor
         val newPitch = player.pitch + pitchDifference * AimAssistConfig.smoothnessFactor
+
+        player.yaw = newYaw.toFloat()
+        player.pitch = MathHelper.clamp(newPitch.toFloat(), -90.0f, 90.0f)
+    }
+
+    fun smoothlyRotatePlayerToBlock(player: ClientPlayerEntity, pos: BlockPos) {
+        val fpos = Vec3d(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5)
+        val dx = fpos.x - player.x
+        val dy = fpos.y - player.eyeY
+        val dz = fpos.z - player.z
+        val distXZ = sqrt(dx * dx + dz * dz)
+
+        val targetYaw = Math.toDegrees(atan2(dz, dx)) - 90.0
+        val targetPitch = -Math.toDegrees(atan2(dy, distXZ))
+
+        // --- Smooth Interpolation ---
+        // Get the shortest angle difference, handling the -180 to 180 degree wrap-around
+        val yawDifference = MathHelper.wrapDegrees(targetYaw - player.yaw)
+        val pitchDifference = targetPitch - player.pitch // Pitch doesn't wrap
+
+        // Apply a fraction of the difference each tick, based on the smoothness factor
+        val newYaw = player.yaw + yawDifference //* AimAssistConfig.smoothnessFactor
+        val newPitch = player.pitch + pitchDifference //* AimAssistConfig.smoothnessFactor
 
         player.yaw = newYaw.toFloat()
         player.pitch = MathHelper.clamp(newPitch.toFloat(), -90.0f, 90.0f)
