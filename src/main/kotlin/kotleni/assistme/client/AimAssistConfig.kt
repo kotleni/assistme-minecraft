@@ -4,5 +4,5 @@ object AimAssistConfig {
     var isEnabled = true
     var smoothnessFactor = 0.4f
     var activationFov = 20.0f
-    var maxDistance = 7.0
+    var maxDistance = 4.5
 }
