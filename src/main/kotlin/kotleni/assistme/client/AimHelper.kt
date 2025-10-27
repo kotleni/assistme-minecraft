@@ -4,6 +4,7 @@ import net.minecraft.client.network.ClientPlayerEntity
 import net.minecraft.entity.Entity
 import net.minecraft.entity.LivingEntity
 import net.minecraft.entity.mob.HostileEntity
+import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.MathHelper
 import net.minecraft.util.math.Vec3d
@@ -17,7 +18,7 @@ object AimHelper {
         val playerLookVec = player.getRotationVec(1.0f)
 
         val potentialTargets = world.getOtherEntities(player, searchBox) { entity ->
-            entity is LivingEntity && entity.isAlive && player.canSee(entity)
+            entity is LivingEntity && entity.isAlive && player.canSee(entity) && entity !is PlayerEntity
         }
 
         var bestTarget: LivingEntity? = null
